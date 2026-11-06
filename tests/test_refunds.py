@@ -31,12 +31,13 @@ def test_AC_1_1_delivered_order_within_30_days_is_refunded_in_full(delivered):
     assert r.json()["order_id"] == "ORD-2000" and r.json()["amount_cents"] == 2500
 
 
-@pytest.mark.parametrize("status", [OrderStatus.refunded])
-def test_AC_1_2_refunded_order_cannot_be_refunded_again(status):
-    client = make_client(an_order("ORD-2001", status))
-    r = client.post("/orders/ORD-2001/refunds")
-    assert r.status_code == 409
-    assert "already been refunded" in r.json()["detail"]
+@pytest.mark.parametrize("order_id", ["ORD-2001", "ORD-2003"])
+def test_AC_1_2_refunded_order_cannot_be_refunded_again(order_id):
+    client = make_client(an_order("ORD-2001", OrderStatus.delivered), an_order("ORD-2003", OrderStatus.delivered))
+    assert client.post(f"/orders/{order_id}/refunds").status_code == 201  # the first refund really happens
+    again = client.post(f"/orders/{order_id}/refunds")
+    assert again.status_code == 409 and "already been refunded" in again.json()["detail"]
+    assert client.get(f"/orders/{order_id}").json()["status"] == "refunded"
 
 
 @pytest.mark.parametrize("delivered, accepted", [

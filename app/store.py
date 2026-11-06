@@ -89,4 +89,5 @@ class OrderStore:
         refund = Refund(id=f"RF-{len(self._refunds) + 1}", order_id=order_id, amount_cents=order.total_cents,
                         created_at=self._clock())
         self._refunds.append(refund)
+        self._orders[order_id] = order.model_copy(update={"status": OrderStatus.refunded})
         return refund
