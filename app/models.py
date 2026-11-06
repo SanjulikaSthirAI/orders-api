@@ -8,6 +8,7 @@ class OrderStatus(StrEnum):
     placed = "placed"
     shipped = "shipped"
     delivered = "delivered"
+    refunded = "refunded"
     cancelled = "cancelled"
 
 
@@ -31,6 +32,13 @@ class Order(BaseModel):
     status: OrderStatus
     created_at: datetime
     delivered_at: datetime | None = None
+
+
+class Refund(BaseModel):
+    id: str
+    order_id: str
+    amount_cents: int
+    created_at: datetime
 
 
 class Error(BaseModel):

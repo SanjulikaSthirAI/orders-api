@@ -1,9 +1,9 @@
 """In-memory order store with synthetic seed data. Replace with a database when this grows up."""
 
 from collections.abc import Callable
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
-from app.models import NewOrder, Order, OrderItem, OrderStatus
+from app.models import NewOrder, Order, OrderItem, OrderStatus, Refund
 
 
 class OrderNotFound(Exception):
@@ -12,6 +12,13 @@ class OrderNotFound(Exception):
 
 class OrderNotCancellable(Exception):
     pass
+
+
+class RefundNotAllowed(Exception):
+    pass
+
+
+REFUND_WINDOW = timedelta(days=30)
 
 
 def _total(items: list[OrderItem]) -> int:
@@ -43,6 +50,7 @@ class OrderStore:
         self._orders = {o.id: o for o in (_seed() if orders is None else orders)}
         self._next = max((int(o.id.split("-")[1]) for o in self._orders.values()), default=1000) + 1
         self._clock = clock
+        self._refunds: list[Refund] = []
 
     def list(self, status: OrderStatus | None = None) -> list[Order]:
         orders = sorted(self._orders.values(), key=lambda o: o.created_at, reverse=True)
@@ -68,3 +76,17 @@ class OrderStore:
         cancelled = order.model_copy(update={"status": OrderStatus.cancelled})
         self._orders[order_id] = cancelled
         return cancelled
+
+    def refund(self, order_id: str) -> Refund:
+        """Refund a delivered order in full, within 30 days of delivery."""
+        order = self.get(order_id)
+        if order.status == OrderStatus.refunded:
+            raise RefundNotAllowed(f"Order {order_id} has already been refunded")
+        if order.status != OrderStatus.delivered:
+            raise RefundNotAllowed(f"Order {order_id} is {order.status.value}; only delivered orders can be refunded")
+        if self._clock() - order.delivered_at > REFUND_WINDOW:
+            raise RefundNotAllowed(f"Order {order_id} was delivered more than 30 days ago")
+        refund = Refund(id=f"RF-{len(self._refunds) + 1}", order_id=order_id, amount_cents=order.total_cents,
+                        created_at=self._clock())
+        self._refunds.append(refund)
+        return refund

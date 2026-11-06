@@ -3,8 +3,8 @@ import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.models import Error, NewOrder, Order, OrderStatus
-from app.store import OrderNotCancellable, OrderNotFound, OrderStore
+from app.models import Error, NewOrder, Order, OrderStatus, Refund
+from app.store import OrderNotCancellable, OrderNotFound, OrderStore, RefundNotAllowed
 
 # The browser UI's origins. Override with ORDERS_UI_ORIGINS (comma-separated) outside local development.
 DEFAULT_UI_ORIGINS = "http://localhost:8080,http://127.0.0.1:8080"
@@ -42,6 +42,17 @@ def create_app(store: OrderStore | None = None) -> FastAPI:
         except OrderNotFound:
             raise HTTPException(404, f"Order {order_id} not found") from None
         except OrderNotCancellable as e:
+            raise HTTPException(409, str(e)) from None
+
+    @app.post("/orders/{order_id}/refunds", response_model=Refund, status_code=201,
+              responses={**NOT_FOUND, 409: {"model": Error, "description": "The order can't be refunded"}},
+              summary="Refund a delivered order in full, within 30 days of delivery")
+    def refund_order(order_id: str) -> Refund:
+        try:
+            return orders.refund(order_id)
+        except OrderNotFound:
+            raise HTTPException(404, f"Order {order_id} not found") from None
+        except RefundNotAllowed as e:
             raise HTTPException(409, str(e)) from None
 
     return app

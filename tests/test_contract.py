@@ -18,4 +18,5 @@ def test_openapi_yaml_matches_the_app():
 def test_the_contract_lists_the_published_operations():
     paths = yaml.safe_load(CONTRACT.read_text(encoding="utf-8"))["paths"]
     operations = {f"{method.upper()} {path}" for path, ops in paths.items() for method in ops}
-    assert operations == {"GET /orders", "POST /orders", "GET /orders/{order_id}", "POST /orders/{order_id}/cancel"}
+    assert operations == {"GET /orders", "POST /orders", "GET /orders/{order_id}", "POST /orders/{order_id}/cancel",
+                          "POST /orders/{order_id}/refunds"}

@@ -121,6 +121,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /orders/{order_id}/refunds:
+    post:
+      summary: Refund a delivered order in full, within 30 days of delivery
+      operationId: refund_order_orders__order_id__refunds_post
+      parameters:
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Order Id
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund'
+        '404':
+          description: No such order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: The order can't be refunded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
     Error:
@@ -230,8 +266,31 @@ components:
       - placed
       - shipped
       - delivered
+      - refunded
       - cancelled
       title: OrderStatus
+    Refund:
+      properties:
+        id:
+          type: string
+          title: Id
+        order_id:
+          type: string
+          title: Order Id
+        amount_cents:
+          type: integer
+          title: Amount Cents
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - order_id
+      - amount_cents
+      - created_at
+      title: Refund
     ValidationError:
       properties:
         loc:
