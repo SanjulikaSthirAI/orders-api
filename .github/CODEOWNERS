@@ -1,0 +1,12 @@
+# Changes to these paths need a review from the owner. Branch protection turns this on
+# ("Require review from Code Owners"); see the orchestrator runbook.
+# Placeholder owner: the demo has one person. Replace with the SA and the security specialist.
+
+# The API contract, and the checks that guard it
+/openapi.yaml            @SanjulikaSthirAI
+/.github/                @SanjulikaSthirAI
+/AGENTS.md               @SanjulikaSthirAI
+
+# Anything touching data shape or auth
+/app/models.py           @SanjulikaSthirAI
+/app/store.py            @SanjulikaSthirAI
