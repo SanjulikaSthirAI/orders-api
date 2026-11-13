@@ -26,3 +26,15 @@ Synthetic demo service. Its data is made up and lives in memory.
 - Errors are `{"detail": "<message>"}` with the right status: 404 unknown id, 409 state conflict, 422 bad input.
 - Every new behaviour needs a test that names the case it covers. Cover the failure paths, not only the happy one.
 - Do not edit `.github/`, `AGENTS.md` or `openapi.yaml` by hand outside a contract change; they are code-owned.
+
+<!-- protected-contracts:start INT-3 -->
+## Protected contracts (INT-3)
+
+Stories must not change these unless plan.json marks the story as a contract change.
+
+- File: `openapi.yaml`
+- Endpoint: `GET /orders`
+- Endpoint: `GET /orders/{order_id}`
+- Endpoint: `POST /orders`
+- Endpoint: `POST /orders/{order_id}/cancel`
+<!-- protected-contracts:end INT-3 -->
