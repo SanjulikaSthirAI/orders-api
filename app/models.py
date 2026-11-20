@@ -42,7 +42,7 @@ class OrderStatusCounts(BaseModel):
 
 class OrderSummary(BaseModel):
     counts: OrderStatusCounts
-    non_cancelled_total_value_cents: int = Field(
+    total_value_cents: int = Field(
         description="Total value in cents of placed, shipped, and delivered orders"
     )
 

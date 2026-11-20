@@ -57,7 +57,7 @@ class OrderStore:
             counts[order.status] += 1
             if order.status != OrderStatus.cancelled:
                 total += getattr(order, "total_cents", None) or 0
-        return OrderSummary(counts=OrderStatusCounts(**counts), non_cancelled_total_value_cents=total)
+        return OrderSummary(counts=OrderStatusCounts(**counts), total_value_cents=total)
 
     def get(self, order_id: str) -> Order:
         try:
