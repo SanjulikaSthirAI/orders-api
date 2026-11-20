@@ -47,6 +47,11 @@ def test_US2_AC_4_5_missing_and_null_customers_do_not_match():
           {"customer": "Alice"}, ["ORD-3"])
 
 
+def test_US2_AC_4_6_AC_5_3_missing_and_null_customers_returned_without_filter():
+    check([order(1, None, "placed"), order(2, "MISSING", "shipped"), order(3, "Alice", "delivered")],
+          {}, ["ORD-1", "ORD-2", "ORD-3"])
+
+
 @pytest.mark.parametrize("customer", ["", "   "])
 def test_US2_AC_4_7_blank_customer_does_not_filter(customer):
     check([order(1, "Alice", "placed"), order(2, "Bob", "shipped")],
