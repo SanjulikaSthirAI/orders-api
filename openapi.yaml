@@ -23,6 +23,7 @@ paths:
         schema:
           anyOf:
           - type: string
+            maxLength: 100
           - type: 'null'
           title: Customer
       responses:

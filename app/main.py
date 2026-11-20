@@ -1,6 +1,6 @@
 import os
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.models import Error, NewOrder, Order, OrderStatus, OrderSummary
@@ -19,7 +19,9 @@ def create_app(store: OrderStore | None = None) -> FastAPI:
     orders = store if store is not None else OrderStore()
 
     @app.get("/orders", response_model=list[Order], summary="List orders, newest first")
-    def list_orders(status: OrderStatus | None = None, customer: str | None = None) -> list[Order]:
+    def list_orders(
+        status: OrderStatus | None = None, customer: str | None = Query(default=None, max_length=100)
+    ) -> list[Order]:
         return orders.list(status, customer)
 
     @app.get("/orders/summary", response_model=OrderSummary, summary="Summarize the order book")
