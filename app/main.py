@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.models import Error, NewOrder, Order, OrderStatus
+from app.models import Error, NewOrder, Order, OrderStatus, OrderSummary
 from app.store import OrderNotCancellable, OrderNotFound, OrderStore
 
 # The browser UI's origins. Override with ORDERS_UI_ORIGINS (comma-separated) outside local development.
@@ -21,6 +21,10 @@ def create_app(store: OrderStore | None = None) -> FastAPI:
     @app.get("/orders", response_model=list[Order], summary="List orders, newest first")
     def list_orders(status: OrderStatus | None = None) -> list[Order]:
         return orders.list(status)
+
+    @app.get("/orders/summary", response_model=OrderSummary, summary="Summarize the order book")
+    def order_summary() -> OrderSummary:
+        return orders.summary()
 
     @app.get("/orders/{order_id}", response_model=Order, responses=NOT_FOUND, summary="Get one order")
     def get_order(order_id: str) -> Order:

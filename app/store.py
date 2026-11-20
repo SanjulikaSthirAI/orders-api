@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from datetime import UTC, datetime
 
-from app.models import NewOrder, Order, OrderItem, OrderStatus
+from app.models import NewOrder, Order, OrderItem, OrderStatus, OrderStatusCounts, OrderSummary
 
 
 class OrderNotFound(Exception):
@@ -47,6 +47,17 @@ class OrderStore:
     def list(self, status: OrderStatus | None = None) -> list[Order]:
         orders = sorted(self._orders.values(), key=lambda o: o.created_at, reverse=True)
         return [o for o in orders if status is None or o.status == status]
+
+    def summary(self) -> OrderSummary:
+        counts = dict.fromkeys(OrderStatus, 0)
+        total = 0
+        for order in self._orders.values():
+            if order.status not in counts:
+                continue
+            counts[order.status] += 1
+            if order.status != OrderStatus.cancelled:
+                total += getattr(order, "total_cents", None) or 0
+        return OrderSummary(counts=OrderStatusCounts(**counts), total_value_cents=total)
 
     def get(self, order_id: str) -> Order:
         try:
