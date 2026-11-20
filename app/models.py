@@ -33,5 +33,19 @@ class Order(BaseModel):
     delivered_at: datetime | None = None
 
 
+class OrderStatusCounts(BaseModel):
+    placed: int
+    shipped: int
+    delivered: int
+    cancelled: int
+
+
+class OrderSummary(BaseModel):
+    counts: OrderStatusCounts
+    total_value_cents: int = Field(
+        description="Total value in cents of placed, shipped, and delivered orders"
+    )
+
+
 class Error(BaseModel):
     detail: str

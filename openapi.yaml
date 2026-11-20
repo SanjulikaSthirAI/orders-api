@@ -55,6 +55,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /orders/summary:
+    get:
+      summary: Summarize the order book
+      operationId: order_summary_orders_summary_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderSummary'
   /orders/{order_id}:
     get:
       summary: Get one order
@@ -232,6 +243,40 @@ components:
       - delivered
       - cancelled
       title: OrderStatus
+    OrderStatusCounts:
+      properties:
+        placed:
+          type: integer
+          title: Placed
+        shipped:
+          type: integer
+          title: Shipped
+        delivered:
+          type: integer
+          title: Delivered
+        cancelled:
+          type: integer
+          title: Cancelled
+      type: object
+      required:
+      - placed
+      - shipped
+      - delivered
+      - cancelled
+      title: OrderStatusCounts
+    OrderSummary:
+      properties:
+        counts:
+          $ref: '#/components/schemas/OrderStatusCounts'
+        total_value_cents:
+          type: integer
+          title: Total Value Cents
+          description: Total value in cents of placed, shipped, and delivered orders
+      type: object
+      required:
+      - counts
+      - total_value_cents
+      title: OrderSummary
     ValidationError:
       properties:
         loc:
