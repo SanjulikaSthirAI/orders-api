@@ -268,14 +268,14 @@ components:
       properties:
         counts:
           $ref: '#/components/schemas/OrderStatusCounts'
-        total_value_cents:
+        non_cancelled_total_value_cents:
           type: integer
-          title: Total Value Cents
+          title: Non Cancelled Total Value Cents
           description: Total value in cents of placed, shipped, and delivered orders
       type: object
       required:
       - counts
-      - total_value_cents
+      - non_cancelled_total_value_cents
       title: OrderSummary
     ValidationError:
       properties:
