@@ -13,14 +13,14 @@ NOT_FOUND = {404: {"model": Error, "description": "No such order"}}
 
 
 def create_app(store: OrderStore | None = None) -> FastAPI:
-    app = FastAPI(title="Orders API", version="1.0.0", description="Orders for the demo shop.")
+    app = FastAPI(title="Orders API", version="1.1.0", description="Orders for the demo shop.")
     origins = os.environ.get("ORDERS_UI_ORIGINS", DEFAULT_UI_ORIGINS).split(",")
     app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["GET", "POST"], allow_headers=["*"])
     orders = store if store is not None else OrderStore()
 
     @app.get("/orders", response_model=list[Order], summary="List orders, newest first")
-    def list_orders(status: OrderStatus | None = None) -> list[Order]:
-        return orders.list(status)
+    def list_orders(status: OrderStatus | None = None, customer: str | None = None) -> list[Order]:
+        return orders.list(status, customer)
 
     @app.get("/orders/summary", response_model=OrderSummary, summary="Summarize the order book")
     def order_summary() -> OrderSummary:

@@ -44,9 +44,11 @@ class OrderStore:
         self._next = max((int(o.id.split("-")[1]) for o in self._orders.values()), default=1000) + 1
         self._clock = clock
 
-    def list(self, status: OrderStatus | None = None) -> list[Order]:
+    def list(self, status: OrderStatus | None = None, customer: str | None = None) -> list[Order]:
         orders = sorted(self._orders.values(), key=lambda o: o.created_at, reverse=True)
-        return [o for o in orders if status is None or o.status == status]
+        customer = customer.strip() if customer is not None else ""
+        return [o for o in orders if (status is None or o.status == status)
+                and (not customer or getattr(o, "customer_name", None) == customer)]
 
     def summary(self) -> OrderSummary:
         counts = dict.fromkeys(OrderStatus, 0)
