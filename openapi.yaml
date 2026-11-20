@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Orders API
   description: Orders for the demo shop.
-  version: 1.0.0
+  version: 1.1.0
 paths:
   /orders:
     get:
@@ -17,6 +17,15 @@ paths:
           - $ref: '#/components/schemas/OrderStatus'
           - type: 'null'
           title: Status
+      - name: customer
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            maxLength: 100
+          - type: 'null'
+          title: Customer
       responses:
         '200':
           description: Successful Response
